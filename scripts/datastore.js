@@ -1,32 +1,36 @@
-(function (window) {
+(function(window) {
     'use strict';
     var App = window.App || {};
+    var Promise = window.Promise;
 
-    function Truck(truckId, db) {
-        //console.log('running the Truck function');
-        this.truckId = truckId;
-        this.db = db;
+    function DataStore() {
+        this.data = {};
     }
 
-    Truck.prototype.createOrder = function (order) {
-        console.log('Adding order for ' + order.emailAddress);
-        this.db.add(order.emailAddress, order);
+    function promiseResolvedWith(value) {
+        var promise = new Promise(function (resolve, reject) {
+            resolve(value);
+        });
+        return promise;
+    }
+
+    DataStore.prototype.add = function() {
+        return promiseResolvedWith(null);
     };
 
-    Truck.prototype.deliverOrder = function (customerId) {
-        console.log('Delivering order for ' + customerId);
-        this.db.remove(customerId);
+    DataStore.prototype.get = function(key) {
+        return promiseResolvedWith(this.data[key]);
     };
 
-    Truck.prototype.printOrders = function () {
-        var customerIdArray = Object.keys(this.db.getAll());
-    
-        console.log('Truck #' + this.truckId + ' has pending orders:');
-        customerIdArray.forEach(function (id) {
-          console.log(this.db.get(id));
-        }.bind(this));
+    DataStore.prototype.getAll = function() {
+        return promiseResolvedWith(this.data);
     };
 
-    App.Truck = Truck;
+    DataStore.prototype.remove = function(key) {
+        delete this.data[key];
+        return promiseResolvedWith(null);
+    };
+
+    App.DataStore = DataStore;
     window.App = App;
 })(window);

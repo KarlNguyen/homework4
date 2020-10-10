@@ -1,28 +1,42 @@
-(function (window) {
+(function(window) {
     'use strict';
     var App = window.App || {};
 
-    function DataStore() {
-        //console.log('running the DataStore function');
-        this.data = {};
+    function Truck(truckId, db) {
+        this.truckId = truckId;
+        this.db = db;
     }
 
-    DataStore.prototype.add = function (key, val) {
-        this.data[key] = val;
-    };
-    
-    DataStore.prototype.get = function (key) {
-        return this.data[key];
-    };
-    
-    DataStore.prototype.getAll = function () {
-        return this.data;
+    Truck.prototype.createOrder = function(order) {
+        console.log('Adding orders for ' + order.emailAddress);
+        return this.db.add(order.emailAddress, order);
     };
 
-    DataStore.prototype.remove = function (key) {
-        delete this.data[key];
+    Truck.prototype.deliverOrder = function(customerId) {
+        console.log('Delivering order for ' + customerId);
+        return this.db.remove(customerId);
     };
 
-    App.DataStore = DataStore;
+    Truck.prototype.printOrders = function(printFn) {
+        return this.db.getAll()
+        .then(function (orders) {
+            var customerIdArray = Object.keys(orders);
+            console.log('Truck #' + this.truckId + ' has pending orders:');
+            customerIdArray.forEach(function(id) {
+                console.log(orders[id]);
+                if (printFn) {
+                    printFn(orders[id]);
+                }
+            }.bind(this));
+        }.bind(this));
+
+    };
+
+    Truck.prototype.createOrderTest = function(order) {
+        this.createOrder(order);
+        return Object.keys(this.db.data);
+    };
+
+    App.Truck = Truck;
     window.App = App;
 })(window);
